@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce-composite="http://www.mulesoft.org/schema/mule/salesforce-composite"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce-composite http://www.mulesoft.org/schema/mule/salesforce-composite/current/mule-salesforce-composite.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<salesforce-composite:composite-config name="Salesforce_Composite_Config" doc:name="Salesforce Composite Config" doc:id="36f25385-89fb-4398-8d92-6692b5e2b296" >
+		<salesforce-composite:oauth-user-pass-connection consumerKey="3MVG9pRzvMkjMb6lmws34iJ475YqKvwrOm49_Rf6ht3mXoYgWqFt3EocdMCIhWRCzn_5SknUUfRgOlsDGV4V2" consumerSecret="8F2DE78F6D860DB417441BE67B325C9AEBF5DC9EC9F518BB071521416C3E9008" username="amhatre@eniquesolutions.com" password="akshay12345" securityToken="ryT8AgtDl6SVd10HwDCXhVFOn" tokenEndpoint="https://eniquesolutions43-dev-ed.my.salesforce.com/services/oauth2/token" />
+	</salesforce-composite:composite-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="1ed0ac58-13dc-4e9a-99f3-0621244cc765" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="salesforce-composite-connector-demoFlow" doc:id="d9337612-fb9c-4b9a-842c-d76a79a580f7" >
+		<http:listener doc:name="Listener" doc:id="53823880-ee24-4aa6-ac37-e6ad765b691c" config-ref="HTTP_Listener_config" path="/test"/>
+		<ee:transform doc:name="Transform Message" doc:id="2a95c6bf-635d-4f7a-8dad-ab4ef660622f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce-composite:execute-composite-request doc:name="Execute composite request" doc:id="f791c4c6-9943-4b66-b66c-3c54d66f56fd" config-ref="Salesforce_Composite_Config"/>
+	</flow>
+	<flow name="salesforce-composite-connector-demoFlow1" doc:id="7c791cf4-ea17-4028-8b8e-dcc89d47d351" >
+		<http:listener doc:name="Listener" doc:id="cb43df01-cacc-44b8-ac6f-7ee79a5ad2d4" config-ref="HTTP_Listener_config" path="/test1"/>
+		<salesforce-composite:execute-composite-batch doc:name="Execute composite batch" doc:id="4e249e63-5af4-48c3-8050-5981ec24fb7b" config-ref="Salesforce_Composite_Config">
+			<salesforce-composite:sub-requests ><![CDATA[#[payload.batchRequests]]]></salesforce-composite:sub-requests>
+		</salesforce-composite:execute-composite-batch>
+	</flow>
+</mule>
